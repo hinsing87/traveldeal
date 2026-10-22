@@ -1,0 +1,30 @@
+name: Daily Travel Deals Bot
+
+on:
+  schedule:
+    # GitHub Action 係用 UTC 時間。香港時間(HKT)係 UTC+8。
+    # 如果你想朝早 8 點 (08:00 HKT) 收到，呢度就要 set 做 00:00 UTC
+    - cron: '0 0 * * *' 
+  workflow_dispatch: # 加咗呢行，你可以隨時喺 GitHub 撳掣手動行一次去 test
+
+jobs:
+  run-bot:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Run Python script
+        env:
+          # 喺度將 GitHub Secrets 嘅環境變數傳入去 Python
+          TWILIO_SID: ${{ secrets.TWILIO_SID }}
+          TWILIO_TOKEN: ${{ secrets.TWILIO_TOKEN }}
+        run: python main.py
